@@ -4,424 +4,702 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Método EC — Escola Cheia</title>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
 <style>
 :root {
-  --navy: #0f1c2e;
-  --navy-mid: #162236;
-  --navy-light: #1e3050;
-  --blue: #4a90d9;
-  --blue-light: #6eaee8;
-  --green: #1D9E75;
-  --green-light: #5DCAA5;
-  --white: #ffffff;
-  --off-white: #e8f0f8;
-  --gray: #7a9bbf;
-  --gray-light: #c8daf0;
-  --border: rgba(74,144,217,0.15);
+  --black: #0a0a0a;
+  --off-black: #111111;
+  --dark: #161616;
+  --border: #252525;
+  --red: #c0392b;
+  --red-bright: #e74c3c;
+  --red-glow: rgba(192,57,43,0.12);
+  --white: #f5f0eb;
+  --white-dim: #b8b0a8;
+  --white-muted: #5c5850;
+  --gold: #c9a96e;
+  --gold-dim: rgba(201,169,110,0.12);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+
 body {
-  font-family: 'Inter', sans-serif;
-  background: var(--navy);
+  background: var(--black);
   color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
   line-height: 1.7;
   overflow-x: hidden;
 }
-h1,h2,h3,h4 { font-family: 'Sora', sans-serif; line-height: 1.25; }
 
-/* HERO */
+/* GRAIN */
+body::after {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:999;
+}
+
+/* SCROLL REVEAL */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal.visible { opacity:1; transform:translateY(0); }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.35s; }
+.reveal-delay-4 { transition-delay: 0.5s; }
+.reveal-left {
+  opacity:0;
+  transform:translateX(-40px);
+  transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal-left.visible { opacity:1; transform:translateX(0); }
+.reveal-scale {
+  opacity:0;
+  transform:scale(0.94);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal-scale.visible { opacity:1; transform:scale(1); }
+
+/* PARALLAX */
+.parallax-bg {
+  will-change: transform;
+}
+
+/* LAYOUT */
+.container { max-width: 760px; margin:0 auto; padding:0 28px; }
+.container-wide { max-width: 980px; margin:0 auto; padding:0 28px; }
+
+/* ====== HERO ====== */
 .hero {
   min-height: 100vh;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding: 120px 0 80px;
+  position:relative;
+  overflow:hidden;
 }
-.hero-left {
-  padding: 5rem 4rem 5rem 5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+
+.hero-glow {
+  position:absolute;
+  top:-120px; left:-180px;
+  width:700px; height:700px;
+  background:radial-gradient(circle, rgba(192,57,43,0.07) 0%, transparent 65%);
+  pointer-events:none;
+  animation: glowPulse 6s ease-in-out infinite;
 }
-.hero-right {
-  height: 100vh;
-  background: url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&q=80') center/cover no-repeat;
-  position: relative;
+
+@keyframes glowPulse {
+  0%,100% { opacity:0.6; transform:scale(1); }
+  50% { opacity:1; transform:scale(1.08); }
 }
-.hero-right::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to right, var(--navy) 0%, transparent 40%);
+
+.hero-counter-strip {
+  display:flex;
+  gap:48px;
+  margin-bottom:56px;
+  border-left:2px solid var(--red);
+  padding-left:24px;
 }
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(74,144,217,0.12);
-  border: 0.5px solid rgba(74,144,217,0.3);
-  border-radius: 20px;
-  padding: 6px 16px;
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--blue-light);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  width: fit-content;
+
+.hero-stat { }
+.hero-stat-num {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:38px;
+  line-height:1;
+  color:var(--red-bright);
+  letter-spacing:0.02em;
 }
-.hero h1 {
-  font-size: clamp(2rem, 3.5vw, 3rem);
-  font-weight: 700;
-  color: var(--blue-light);
-  line-height: 1.2;
+.hero-stat-label {
+  font-size:11px;
+  color:var(--white-muted);
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  margin-top:2px;
 }
+
+.eyebrow {
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--red-bright);
+  margin-bottom:24px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.eyebrow::before { content:''; display:block; width:28px; height:1px; background:var(--red-bright); }
+
+h1.hero-headline {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(56px,9vw,96px);
+  line-height:0.93;
+  letter-spacing:0.01em;
+  margin-bottom:30px;
+}
+h1.hero-headline .acc {
+  color:var(--red-bright);
+  font-family:'Instrument Serif',serif;
+  font-style:italic;
+  font-size:clamp(62px,10vw,104px);
+}
+
 .hero-sub {
-  font-size: 1.05rem;
-  color: var(--gray-light);
-  line-height: 1.75;
-  max-width: 500px;
-}
-.hero-sub strong { color: var(--white); font-weight: 500; }
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--blue);
-  color: var(--white);
-  font-family: 'Sora', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 600;
-  padding: 16px 32px;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.2s;
-  width: fit-content;
-  letter-spacing: 0.02em;
-}
-.btn-primary:hover { background: var(--blue-light); transform: translateY(-2px); }
-.hero-hint { font-size: 12px; color: var(--gray); }
-
-/* SEÇÕES */
-.section {
-  padding: 5rem 5rem;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-.section-tag {
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--blue);
-  margin-bottom: 0.75rem;
-  display: block;
-}
-.section h2 {
-  font-size: clamp(1.6rem, 2.5vw, 2.2rem);
-  font-weight: 700;
-  color: var(--blue-light);
-  margin-bottom: 1rem;
-}
-.section p {
-  font-size: 1rem;
-  color: var(--gray-light);
-  line-height: 1.8;
-  margin-bottom: 1rem;
-  max-width: 680px;
+  font-size:17px;
+  color:var(--white-dim);
+  max-width:520px;
+  line-height:1.7;
+  margin-bottom:48px;
 }
 
-/* DIVIDER */
-.divider {
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--navy-light), transparent);
+.btn {
+  display:inline-block;
+  background:var(--red);
+  color:var(--white);
+  font-family:'DM Sans',sans-serif;
+  font-weight:500;
+  font-size:14px;
+  letter-spacing:0.07em;
+  text-transform:uppercase;
+  padding:18px 40px;
+  text-decoration:none;
+  transition:background 0.2s, transform 0.15s, box-shadow 0.2s;
+  position:relative;
+}
+.btn:hover { background:var(--red-bright); transform:translateY(-2px); box-shadow:0 8px 32px rgba(192,57,43,0.3); }
+.btn::after { content:'→'; margin-left:10px; display:inline-block; transition:transform 0.2s; }
+.btn:hover::after { transform:translateX(5px); }
+
+.cta-micro { font-size:12px; color:var(--white-muted); letter-spacing:0.06em; margin-top:14px; }
+
+/* ====== SECTION COMMON ====== */
+.section-label {
+  font-size:10px;
+  font-weight:500;
+  letter-spacing:0.28em;
+  text-transform:uppercase;
+  color:var(--white-muted);
+  margin-bottom:44px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+.section-title {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(40px,6vw,66px);
+  line-height:1;
+  letter-spacing:0.01em;
 }
 
-/* CARDS DE DOR */
-.pain-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1px;
-  background: var(--border);
-  border-radius: 16px;
-  overflow: hidden;
-  margin-top: 2.5rem;
-}
-.pain-card {
-  background: var(--navy-mid);
-  padding: 1.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-.pain-card-num {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--blue);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-.pain-card h4 {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--white);
-}
-.pain-card p {
-  font-size: 0.9rem;
-  color: var(--gray);
-  line-height: 1.65;
-  margin: 0;
-  max-width: 100%;
+/* ====== NARRATIVA ====== */
+.narrativa { padding:110px 0; position:relative; overflow:hidden; }
+
+.narrativa-bg-text {
+  position:absolute;
+  top:50%;
+  right:-40px;
+  transform:translateY(-50%);
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(120px,18vw,220px);
+  color:rgba(192,57,43,0.04);
+  letter-spacing:0.02em;
+  pointer-events:none;
+  user-select:none;
+  white-space:nowrap;
 }
 
-/* MÓDULOS */
-.modules {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  background: var(--border);
-  border-radius: 16px;
-  overflow: hidden;
-  margin-top: 2.5rem;
-}
-.module {
-  background: var(--navy-mid);
-  padding: 2rem 2.5rem;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 2rem;
-  align-items: start;
-}
-.module-num {
-  font-family: 'Sora', sans-serif;
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: rgba(74,144,217,0.2);
-  line-height: 1;
-  width: 60px;
-  text-align: right;
-}
-.module-content h3 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--blue-light);
-  margin-bottom: 0.5rem;
-}
-.module-content p {
-  font-size: 0.9rem;
-  color: var(--gray);
-  line-height: 1.7;
-  margin: 0 0 1rem;
-  max-width: 100%;
-}
-.module-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.module-tag {
-  font-size: 11px;
-  color: var(--blue-light);
-  background: rgba(74,144,217,0.1);
-  border: 0.5px solid rgba(74,144,217,0.2);
-  border-radius: 20px;
-  padding: 3px 10px;
+.narrativa-titulo { margin-bottom:52px; }
+.narrativa-titulo .vermelho { color:var(--red-bright); }
+
+.narrativa-corpo {
+  border-left:2px solid var(--red);
+  padding-left:36px;
+  display:flex;
+  flex-direction:column;
+  gap:28px;
 }
 
-/* ENTREGÁVEIS */
-.deliverables {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 12px;
-  margin-top: 2rem;
+.narrativa-corpo p {
+  font-size:18px;
+  line-height:1.78;
+  color:var(--white-dim);
 }
-.deliverable {
-  background: var(--navy-mid);
-  border: 0.5px solid var(--border);
-  border-radius: 12px;
-  padding: 1.25rem;
+.narrativa-corpo p strong { color:var(--white); font-weight:400; }
+
+.narrativa-corpo .linha-final {
+  font-family:'Instrument Serif',serif;
+  font-style:italic;
+  font-size:22px;
+  color:var(--white);
+  padding-top:8px;
 }
-.deliverable-icon {
-  font-size: 22px;
-  margin-bottom: 10px;
-  display: block;
-}
-.deliverable h4 {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--white);
-  margin-bottom: 4px;
-}
-.deliverable p {
-  font-size: 0.8rem;
-  color: var(--gray);
-  line-height: 1.5;
-  margin: 0;
-  max-width: 100%;
+.narrativa-corpo .linha-cnpj {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(36px,5vw,54px);
+  color:var(--red-bright);
+  letter-spacing:0.05em;
+  line-height:1;
+  padding-top:4px;
 }
 
-/* PARA QUEM É */
-.for-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 2rem;
-}
-.for-card {
-  border-radius: 12px;
-  padding: 1.5rem;
-  border: 0.5px solid;
-}
-.for-card.yes {
-  background: rgba(29,158,117,0.06);
-  border-color: rgba(29,158,117,0.2);
-}
-.for-card.no {
-  background: rgba(255,255,255,0.03);
-  border-color: rgba(255,255,255,0.08);
-}
-.for-label {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 1rem;
-  display: block;
-}
-.for-card.yes .for-label { color: var(--green-light); }
-.for-card.no .for-label { color: var(--gray); }
-.for-card ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-.for-card ul li {
-  font-size: 0.88rem;
-  color: var(--gray-light);
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  line-height: 1.5;
-}
-.for-card.yes ul li::before { content: '✓'; color: var(--green-light); font-weight: 700; flex-shrink: 0; }
-.for-card.no ul li::before { content: '—'; color: var(--gray); font-weight: 400; flex-shrink: 0; }
-
-/* OFERTA */
-.offer-wrap {
-  max-width: 560px;
-  margin: 0 auto;
-  padding: 5rem 1.5rem;
-  text-align: center;
-}
-.price-card {
-  background: var(--navy-mid);
-  border: 0.5px solid rgba(74,144,217,0.2);
-  border-radius: 20px;
-  padding: 3rem 2.5rem;
-  margin-top: 2rem;
-}
-.price-label { font-size: 12px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
-.price-value {
-  font-family: 'Sora', sans-serif;
-  font-size: 4rem;
-  font-weight: 800;
-  color: var(--white);
-  line-height: 1;
-  margin-bottom: 4px;
-}
-.price-value span { font-size: 1.5rem; vertical-align: super; color: var(--gray); }
-.price-sub { font-size: 0.85rem; color: var(--gray); margin-bottom: 2.5rem; }
-.guarantee {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  background: rgba(29,158,117,0.06);
-  border: 0.5px solid rgba(29,158,117,0.2);
-  border-radius: 10px;
-  padding: 1rem 1.25rem;
-  text-align: left;
-  margin-bottom: 1.5rem;
-}
-.guarantee-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
-.guarantee p { font-size: 0.85rem; color: var(--gray-light); line-height: 1.6; margin: 0; max-width: 100%; }
-.guarantee p strong { color: var(--white); font-weight: 500; }
-.urgency {
-  font-size: 0.85rem;
-  color: var(--blue);
-  background: rgba(74,144,217,0.08);
-  border: 0.5px solid rgba(74,144,217,0.2);
-  border-radius: 8px;
-  padding: 0.9rem 1.1rem;
-  margin-bottom: 1.5rem;
-  line-height: 1.6;
+/* ====== CHART SECTION ====== */
+.chart-section {
+  padding:0 0 100px;
+  position:relative;
 }
 
-/* AUTOR */
-.author-section {
-  padding: 5rem;
-  max-width: 1100px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 4rem;
-  align-items: center;
+.charts-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+  margin-top:56px;
 }
-.author-left {
-  background: var(--navy-mid);
-  border: 0.5px solid var(--border);
-  border-radius: 16px;
-  padding: 2rem;
-  text-align: center;
-}
-.author-avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: rgba(74,144,217,0.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  margin: 0 auto 1rem;
-  border: 2px solid rgba(74,144,217,0.3);
-}
-.author-name { font-size: 1rem; font-weight: 600; color: var(--white); margin-bottom: 4px; }
-.author-role { font-size: 0.8rem; color: var(--gray); }
-.author-right h2 { color: var(--blue-light); margin-bottom: 1rem; }
-.author-right p { color: var(--gray-light); font-size: 0.95rem; line-height: 1.8; margin-bottom: 0.75rem; max-width: 100%; }
 
-/* FOOTER */
+.chart-card {
+  background:var(--dark);
+  border:1px solid var(--border);
+  padding:32px 28px;
+  position:relative;
+  overflow:hidden;
+}
+
+.chart-card::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:2px;
+  background:linear-gradient(to right, var(--red), transparent);
+}
+
+.chart-card-label {
+  font-size:10px;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--white-muted);
+  margin-bottom:8px;
+}
+
+.chart-card-title {
+  font-size:15px;
+  font-weight:400;
+  color:var(--white);
+  margin-bottom:24px;
+  line-height:1.4;
+}
+
+.chart-wrapper {
+  position:relative;
+  width:100%;
+}
+
+/* ====== COUNTER ANIMATED ====== */
+.big-counter-section {
+  padding:80px 0;
+  background:var(--off-black, #111);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+
+.counters-row {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:0;
+}
+
+.counter-item {
+  padding:40px 32px;
+  border-right:1px solid var(--border);
+  position:relative;
+}
+.counter-item:last-child { border-right:none; }
+
+.counter-num {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(52px,7vw,80px);
+  line-height:1;
+  color:var(--red-bright);
+  letter-spacing:0.02em;
+  display:block;
+}
+
+.counter-desc {
+  font-size:14px;
+  color:var(--white-dim);
+  margin-top:10px;
+  line-height:1.5;
+  max-width:200px;
+}
+
+/* ====== SINTOMAS ====== */
+.sintomas { padding:100px 0; }
+
+.sintomas-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1px;
+  background:var(--border);
+  border:1px solid var(--border);
+  margin-top:48px;
+}
+
+.sintoma-card {
+  background:var(--black);
+  padding:36px 32px;
+  transition:background 0.25s;
+  position:relative;
+  overflow:hidden;
+}
+.sintoma-card:hover { background:var(--dark); }
+
+.sintoma-card::after {
+  content:'';
+  position:absolute;
+  bottom:0; left:0;
+  width:0; height:2px;
+  background:var(--red);
+  transition:width 0.4s ease;
+}
+.sintoma-card:hover::after { width:100%; }
+
+.sintoma-num {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:11px;
+  letter-spacing:0.22em;
+  color:var(--red);
+  display:block;
+  margin-bottom:14px;
+}
+
+.sintoma-titulo {
+  font-size:16px;
+  font-weight:400;
+  color:var(--white);
+  line-height:1.4;
+  margin-bottom:10px;
+}
+
+.sintoma-desc {
+  font-size:13px;
+  color:var(--white-muted);
+  line-height:1.65;
+}
+
+/* ====== VIRADA ====== */
+.virada { padding:100px 0; position:relative; }
+
+.virada::before {
+  content:'';
+  position:absolute;
+  right:-60px; top:50%;
+  transform:translateY(-50%);
+  width:500px; height:500px;
+  background:radial-gradient(circle, var(--red-glow) 0%, transparent 65%);
+  pointer-events:none;
+}
+
+.virada-bloco {
+  background:var(--dark);
+  border:1px solid var(--border);
+  border-left:3px solid var(--red);
+  padding:56px 52px;
+  position:relative;
+}
+
+.virada-bloco::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:1px;
+  background:linear-gradient(to right, var(--red), transparent);
+}
+
+.virada-titulo {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(34px,5vw,52px);
+  line-height:1;
+  margin-bottom:36px;
+  letter-spacing:0.01em;
+}
+
+.virada-corpo { display:flex; flex-direction:column; gap:20px; }
+.virada-corpo p { font-size:17px; color:var(--white-dim); line-height:1.75; }
+.virada-corpo .destaque {
+  font-family:'Instrument Serif',serif;
+  font-style:italic;
+  font-size:20px;
+  color:var(--white);
+}
+.virada-corpo .conclusao {
+  font-size:16px;
+  color:var(--gold);
+  padding-top:12px;
+  border-top:1px solid var(--border);
+}
+
+/* ====== SOLUÇÃO ====== */
+.solucao { padding:100px 0; background:var(--off-black, #111); }
+
+.solucao-sub {
+  font-size:17px;
+  color:var(--white-dim);
+  max-width:580px;
+  margin-top:16px;
+}
+
+.modulos {
+  display:flex;
+  flex-direction:column;
+  gap:1px;
+  background:var(--border);
+  border:1px solid var(--border);
+  margin-top:56px;
+}
+
+.modulo {
+  background:var(--off-black, #111);
+  display:grid;
+  grid-template-columns:72px 1fr;
+  transition:background 0.2s;
+}
+.modulo:hover { background:var(--dark); }
+
+.modulo-num-col {
+  background:var(--dark);
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  padding:36px 0 0;
+  border-right:1px solid var(--border);
+}
+
+.modulo-num {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:12px;
+  letter-spacing:0.2em;
+  color:var(--red);
+  writing-mode:vertical-rl;
+  transform:rotate(180deg);
+}
+
+.modulo-corpo { padding:32px 36px; }
+.modulo-titulo { font-size:18px; font-weight:500; color:var(--white); margin-bottom:12px; }
+.modulo-desc { font-size:15px; color:var(--white-dim); line-height:1.65; margin-bottom:18px; }
+.tags { display:flex; flex-wrap:wrap; gap:8px; }
+.tag {
+  font-size:11px;
+  letter-spacing:0.07em;
+  color:var(--white-muted);
+  border:1px solid var(--border);
+  padding:4px 11px;
+  text-transform:uppercase;
+  transition:border-color 0.2s, color 0.2s;
+}
+.modulo:hover .tag { border-color:#333; color:var(--white-dim); }
+
+/* ====== MATERIAIS ====== */
+.materiais { padding:80px 0; }
+
+.materiais-grid {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+  margin-top:40px;
+}
+
+.material-item {
+  background:var(--dark);
+  border:1px solid var(--border);
+  padding:28px;
+  display:flex;
+  gap:18px;
+  align-items:flex-start;
+  transition:border-color 0.2s, transform 0.2s;
+}
+.material-item:hover { border-color:var(--red); transform:translateY(-3px); }
+.mat-icon { font-size:22px; flex-shrink:0; margin-top:2px; }
+.mat-info h4 { font-size:15px; font-weight:500; margin-bottom:5px; }
+.mat-info p { font-size:13px; color:var(--white-muted); line-height:1.55; }
+
+/* ====== PARA QUEM ====== */
+.para-quem { padding:100px 0; background:var(--off-black,#111); }
+
+.pq-intro {
+  font-family:'Instrument Serif',serif;
+  font-style:italic;
+  font-size:20px;
+  color:var(--white-dim);
+  padding-left:24px;
+  border-left:2px solid var(--gold);
+  margin-bottom:48px;
+}
+
+.pq-grid { display:grid; grid-template-columns:1fr 1fr; gap:28px; }
+.pq-col h3 {
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  margin-bottom:24px;
+  padding-bottom:14px;
+  border-bottom:1px solid var(--border);
+}
+.pq-col.sim h3 { color:var(--gold); }
+.pq-col.nao h3 { color:var(--white-muted); }
+
+.pq-lista { list-style:none; display:flex; flex-direction:column; gap:14px; }
+.pq-lista li {
+  font-size:15px;
+  color:var(--white-dim);
+  padding-left:22px;
+  position:relative;
+  line-height:1.5;
+}
+.pq-col.sim .pq-lista li::before { content:'✓'; position:absolute; left:0; color:var(--gold); font-size:13px; top:1px; }
+.pq-col.nao .pq-lista li::before { content:'×'; position:absolute; left:0; color:var(--white-muted); font-size:15px; top:0; line-height:1.4; }
+
+/* ====== CRIADOR ====== */
+.criador { padding:100px 0; }
+
+.criador-bloco { display:grid; grid-template-columns:1fr 2fr; gap:64px; align-items:start; }
+.criador-meta { position:sticky; top:40px; }
+.criador-label { font-size:10px; letter-spacing:0.25em; text-transform:uppercase; color:var(--white-muted); margin-bottom:14px; }
+.criador-cargo {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:30px;
+  line-height:1.1;
+  margin-bottom:8px;
+  letter-spacing:0.02em;
+}
+.criador-anos { font-size:13px; color:var(--red-bright); letter-spacing:0.05em; }
+
+.criador-texto { display:flex; flex-direction:column; gap:22px; }
+.criador-texto p { font-size:17px; color:var(--white-dim); line-height:1.78; }
+.criador-texto p strong { color:var(--white); font-weight:400; }
+.criador-texto .final { font-family:'Instrument Serif',serif; font-size:19px; color:var(--white); }
+
+/* ====== PREÇO ====== */
+.preco {
+  padding:100px 0;
+  background:var(--dark);
+  position:relative;
+  overflow:hidden;
+}
+.preco::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  background:radial-gradient(ellipse at center bottom, rgba(192,57,43,0.07) 0%, transparent 55%);
+}
+
+.preco-bloco { max-width:560px; margin:0 auto; text-align:center; position:relative; }
+
+.preco-titulo {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(40px,6vw,64px);
+  line-height:1;
+  margin-bottom:48px;
+}
+
+.preco-box {
+  background:var(--off-black, #111);
+  border:1px solid var(--border);
+  padding:52px 44px;
+  margin-bottom:24px;
+  position:relative;
+}
+.preco-box::before {
+  content:'';
+  position:absolute;
+  top:0; left:50%; transform:translateX(-50%);
+  width:55%; height:1px;
+  background:linear-gradient(to right, transparent, var(--red), transparent);
+}
+
+.preco-label { font-size:11px; letter-spacing:0.25em; text-transform:uppercase; color:var(--white-muted); margin-bottom:18px; }
+.preco-valor {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:84px;
+  line-height:1;
+  margin-bottom:4px;
+  letter-spacing:0.02em;
+}
+.preco-prefix { font-size:30px; vertical-align:top; margin-top:14px; display:inline-block; color:var(--white-dim); }
+.preco-desc { font-size:14px; color:var(--white-muted); margin-bottom:36px; }
+.preco-box .btn { width:100%; text-align:center; font-size:14px; padding:20px; }
+
+.garantia {
+  background:var(--gold-dim);
+  border:1px solid rgba(201,169,110,0.18);
+  padding:20px 24px;
+  display:flex;
+  gap:16px;
+  align-items:flex-start;
+  text-align:left;
+  margin-bottom:32px;
+}
+.garantia-icon { font-size:20px; flex-shrink:0; }
+.garantia-texto { font-size:14px; color:var(--white-dim); line-height:1.6; }
+.garantia-texto strong { color:var(--gold); font-weight:400; }
+
+.preco-urgencia {
+  font-family:'Instrument Serif',serif;
+  font-style:italic;
+  font-size:17px;
+  color:var(--white-dim);
+  line-height:1.7;
+}
+.preco-urgencia strong {
+  color:var(--white);
+  font-style:normal;
+  font-family:'DM Sans',sans-serif;
+  font-weight:400;
+}
+
+/* ====== FOOTER ====== */
 footer {
-  padding: 2rem;
-  text-align: center;
-  border-top: 1px solid var(--navy-light);
-  font-size: 0.8rem;
-  color: var(--gray);
-  opacity: 0.5;
+  padding:32px 0;
+  border-top:1px solid var(--border);
+  text-align:center;
 }
+footer p { font-size:12px; color:var(--white-muted); letter-spacing:0.05em; }
 
-/* ANIMAÇÃO */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.hero-left > * { animation: fadeUp 0.6s ease both; }
-.hero-left > *:nth-child(1) { animation-delay: 0.1s; }
-.hero-left > *:nth-child(2) { animation-delay: 0.2s; }
-.hero-left > *:nth-child(3) { animation-delay: 0.35s; }
-.hero-left > *:nth-child(4) { animation-delay: 0.5s; }
-.hero-left > *:nth-child(5) { animation-delay: 0.6s; }
+/* HERO ANIM */
+@keyframes fadeUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+.ha1{animation:fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) both;animation-delay:0.1s;opacity:0}
+.ha2{animation:fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) both;animation-delay:0.25s;opacity:0}
+.ha3{animation:fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) both;animation-delay:0.4s;opacity:0}
+.ha4{animation:fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) both;animation-delay:0.55s;opacity:0}
+.ha5{animation:fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) both;animation-delay:0.7s;opacity:0}
 
-/* MOBILE */
-@media (max-width: 768px) {
-  .hero { grid-template-columns: 1fr; }
-  .hero-left { padding: 4rem 1.5rem 3rem; }
-  .hero-right { display: none; }
-  .section { padding: 3.5rem 1.5rem; }
-  .module { grid-template-columns: 1fr; gap: 0.5rem; }
-  .module-num { display: none; }
-  .for-grid { grid-template-columns: 1fr; }
-  .author-section { grid-template-columns: 1fr; gap: 2rem; padding: 3.5rem 1.5rem; }
-  .offer-wrap { padding: 3.5rem 1.25rem; }
+/* RESPONSIVE */
+@media(max-width:640px){
+  .charts-grid{grid-template-columns:1fr}
+  .counters-row{grid-template-columns:1fr}
+  .counter-item{border-right:none;border-bottom:1px solid var(--border)}
+  .sintomas-grid{grid-template-columns:1fr}
+  .materiais-grid{grid-template-columns:1fr}
+  .pq-grid{grid-template-columns:1fr}
+  .criador-bloco{grid-template-columns:1fr;gap:32px}
+  .criador-meta{position:static}
+  .modulo{grid-template-columns:1fr}
+  .modulo-num-col{writing-mode:horizontal-tb;padding:16px 24px;border-right:none;border-bottom:1px solid var(--border)}
+  .modulo-num{writing-mode:horizontal-tb;transform:none}
+  .virada-bloco{padding:36px 28px}
+  .hero-counter-strip{gap:28px}
 }
 </style>
 </head>
@@ -429,221 +707,570 @@ footer {
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-left">
-    <span class="badge">Método EC — Escola Cheia</span>
-    <h1>O processo comercial que sua escola de inglês ainda não tem</h1>
-    <p class="hero-sub">Scripts prontos de prospecção, follow-up e quebra de objeções — desenvolvidos para escolas de inglês que querem <strong>matricular mais sem depender de indicação.</strong></p>
-    <a href="LINK_HOTMART_AQUI" class="btn-primary">
-      Quero acesso ao Método EC
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-    </a>
-    <p class="hero-hint">Acesso imediato · R$ 37 · Garantia de 7 dias</p>
-  </div>
-  <div class="hero-right"></div>
-</section>
+  <div class="hero-glow"></div>
+  <div class="container">
+    <div class="hero-counter-strip ha1">
+      <div class="hero-stat">
+        <span class="hero-stat-num" id="hc1">0</span>
+        <p class="hero-stat-label">leads sem resposta/mês</p>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num" id="hc2">0</span>
+        <p class="hero-stat-label">matrículas perdidas</p>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num" id="hc3">R$ 0</span>
+        <p class="hero-stat-label">receita que não entrou</p>
+      </div>
+    </div>
 
-<div class="divider"></div>
+    <p class="eyebrow ha2">Método EC — Escola Cheia</p>
 
-<!-- O PROBLEMA -->
-<section class="section">
-  <span class="section-tag">O padrão que se repete</span>
-  <h2>O problema que ninguém resolve</h2>
-  <p>Em mais de 4 anos atendendo escolas de inglês como consultor, o mesmo padrão se repetiu em praticamente todas elas — independente do tamanho, da cidade ou da metodologia de ensino.</p>
+    <h1 class="hero-headline ha3">
+      Cada mês sem<br>
+      processo é dinheiro<br>
+      <span class="acc">que não volta.</span>
+    </h1>
 
-  <div class="pain-grid">
-    <div class="pain-card">
-      <span class="pain-card-num">01</span>
-      <h4>O lead some após o primeiro contato</h4>
-      <p>A escola responde o que foi perguntado, manda o preço e espera. O lead não retorna. Não há follow-up. A oportunidade se perde.</p>
-    </div>
-    <div class="pain-card">
-      <span class="pain-card-num">02</span>
-      <h4>Seguidores que nunca viram alunos</h4>
-      <p>A pessoa curte os posts, acompanha os stories, mas nunca manda mensagem. A escola não sabe como abordar sem parecer invasiva.</p>
-    </div>
-    <div class="pain-card">
-      <span class="pain-card-num">03</span>
-      <h4>Objeções que travam a venda</h4>
-      <p>"Tá caro", "vou pensar", "não tenho tempo" — essas três frases são responsáveis pela maioria das matrículas que não acontecem.</p>
-    </div>
-    <div class="pain-card">
-      <span class="pain-card-num">04</span>
-      <h4>Dependência total de indicação</h4>
-      <p>Quando o fluxo espontâneo cai, a escola não sabe o que fazer além de postar no feed. Não há processo ativo de captação.</p>
-    </div>
-    <div class="pain-card">
-      <span class="pain-card-num">05</span>
-      <h4>Alunos que somem antes de cancelar</h4>
-      <p>O churn começa nas faltas — e a escola só percebe quando o aluno já parou de pagar. Sem protocolo de retenção, a receita sangra.</p>
-    </div>
-    <div class="pain-card">
-      <span class="pain-card-num">06</span>
-      <h4>A causa real do problema</h4>
-      <p>Não é a qualidade do ensino. É a ausência de um processo comercial simples, replicável e humano — que qualquer pessoa do time consiga seguir.</p>
+    <p class="hero-sub ha4">
+      Scripts prontos de prospecção, follow-up e quebra de objeções para escolas de inglês que querem parar de improvisar — e começar a matricular.
+    </p>
+
+    <div class="ha5">
+      <a href="LINK_HOTMART_AQUI" class="btn">Quero acesso ao Método EC</a>
+      <p class="cta-micro">Acesso imediato &nbsp;·&nbsp; R$ 37 &nbsp;·&nbsp; Garantia de 7 dias</p>
     </div>
   </div>
 </section>
 
-<div class="divider"></div>
+<!-- NARRATIVA -->
+<section class="narrativa">
+  <div class="narrativa-bg-text">CNPJ</div>
+  <div class="container">
+    <p class="section-label reveal">A realidade que ninguém conta</p>
+    <h2 class="section-title narrativa-titulo reveal reveal-delay-1">
+      Você abriu a escola.<br>
+      E <span class="vermelho">ficou sozinho.</span>
+    </h2>
+
+    <div class="narrativa-corpo">
+      <p class="reveal reveal-delay-1">
+        <strong>Você investiu. Assinou o contrato. Acreditou no negócio.</strong><br>
+        Mas quando abriu as portas, percebeu que ninguém te ensinou a parte mais importante: como vender.
+      </p>
+      <p class="reveal reveal-delay-2">
+        A franqueadora te entregou o manual de operações.<br>
+        Não te ensinou a abordar um lead. Não te deu script. Não te mostrou como fazer follow-up.
+      </p>
+      <p class="reveal reveal-delay-2">
+        <strong>Você não sabe o que postar.</strong> Quando posta, ninguém responde.<br>
+        <strong>Você não sabe como abordar.</strong> Quando alguém pergunta o preço, você manda a tabela e fica esperando.
+      </p>
+      <p class="reveal reveal-delay-3">
+        O lead some. Você não faz follow-up porque não sabe o que escrever sem parecer chato.<br>
+        Os alunos que você já tem começam a faltar. Você percebe que está perdendo — mas não sabe por onde segurar.
+      </p>
+      <p class="linha-final reveal reveal-delay-3">Sem direção. Sem processo. Sem resultado.</p>
+      <p class="linha-cnpj reveal reveal-delay-4">CNPJ BAIXADO.</p>
+    </div>
+  </div>
+</section>
+
+<!-- GRÁFICOS -->
+<section class="chart-section">
+  <div class="container-wide">
+    <div class="container">
+      <p class="section-label reveal">O que os dados mostram</p>
+      <h2 class="section-title reveal reveal-delay-1">O ciclo de queda<br>sem processo comercial</h2>
+    </div>
+
+    <div class="charts-grid" style="margin-top:52px;">
+
+      <div class="chart-card reveal reveal-delay-1">
+        <p class="chart-card-label">Alunos ativos</p>
+        <p class="chart-card-title">Queda progressiva sem retenção ativa</p>
+        <div class="chart-wrapper" style="height:200px">
+          <canvas id="chartAlunos" role="img" aria-label="Gráfico de queda de alunos ao longo de 8 meses sem processo comercial">Queda de alunos: 80, 74, 65, 58, 49, 40, 31, 22.</canvas>
+        </div>
+      </div>
+
+      <div class="chart-card reveal reveal-delay-2">
+        <p class="chart-card-label">Caixa mensal (R$)</p>
+        <p class="chart-card-title">Receita que sangra mês a mês</p>
+        <div class="chart-wrapper" style="height:200px">
+          <canvas id="chartCaixa" role="img" aria-label="Gráfico de queda de receita ao longo de 8 meses">Receita mensal caindo de R$18.000 até R$5.000.</canvas>
+        </div>
+      </div>
+
+      <div class="chart-card reveal reveal-delay-2">
+        <p class="chart-card-label">Leads convertidos (%)</p>
+        <p class="chart-card-title">Taxa de conversão sem follow-up estruturado</p>
+        <div class="chart-wrapper" style="height:200px">
+          <canvas id="chartConversao" role="img" aria-label="Comparativo de taxa de conversão com e sem processo">Com processo: 32%. Sem processo: 7%.</canvas>
+        </div>
+      </div>
+
+      <div class="chart-card reveal reveal-delay-3">
+        <p class="chart-card-label">Motivo de fechamento</p>
+        <p class="chart-card-title">Por que escolas baixam o CNPJ</p>
+        <div class="chart-wrapper" style="height:200px">
+          <canvas id="chartMotivo" role="img" aria-label="Gráfico de pizza com motivos de fechamento de escolas">Sem processo comercial: 58%. Falta de capital: 22%. Outros: 20%.</canvas>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CONTADORES -->
+<section class="big-counter-section">
+  <div class="container-wide">
+    <div class="counters-row">
+      <div class="counter-item reveal">
+        <span class="counter-num" data-target="73">0</span>
+        <p class="counter-desc">das escolas sem processo comercial fecham nos primeiros 2 anos</p>
+        <span style="font-size:11px;color:var(--red-bright);letter-spacing:0.1em">%</span>
+      </div>
+      <div class="counter-item reveal reveal-delay-1">
+        <span class="counter-num" data-target="8">0</span>
+        <p class="counter-desc">leads por mês perdidos em média por falta de follow-up estruturado</p>
+        <span style="font-size:11px;color:var(--red-bright);letter-spacing:0.1em">por semana</span>
+      </div>
+      <div class="counter-item reveal reveal-delay-2">
+        <span class="counter-num" data-prefix="R$ " data-target="4700" data-suffix="">R$ 0</span>
+        <p class="counter-desc">em matrículas que não acontecem por mês — só por falta de script de abordagem</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SINTOMAS -->
+<section class="sintomas">
+  <div class="container-wide">
+    <div class="container">
+      <p class="section-label reveal">Os sintomas do problema</p>
+      <h2 class="section-title reveal reveal-delay-1">Você reconhece<br>algum disso?</h2>
+    </div>
+
+    <div class="sintomas-grid" style="margin-top:52px;">
+
+      <div class="sintoma-card reveal">
+        <span class="sintoma-num">— 01</span>
+        <p class="sintoma-titulo">Você manda o preço e reza para ele voltar.</p>
+        <p class="sintoma-desc">O lead não retorna. Não há follow-up. A oportunidade se perde — e você nem sabe quantas vezes isso aconteceu este mês.</p>
+      </div>
+
+      <div class="sintoma-card reveal reveal-delay-1">
+        <span class="sintoma-num">— 02</span>
+        <p class="sintoma-titulo">Você tem seguidores. Não tem matrículas.</p>
+        <p class="sintoma-desc">A pessoa curte os posts, acompanha os stories, mas nunca manda mensagem. Você não sabe como abordar sem parecer invasivo.</p>
+      </div>
+
+      <div class="sintoma-card reveal reveal-delay-1">
+        <span class="sintoma-num">— 03</span>
+        <p class="sintoma-titulo">"Tá caro" — e você congela.</p>
+        <p class="sintoma-desc">Essas duas palavras travam a venda. Você não sabe o que responder. A conversa morre ali. A matrícula vai embora.</p>
+      </div>
+
+      <div class="sintoma-card reveal reveal-delay-2">
+        <span class="sintoma-num">— 04</span>
+        <p class="sintoma-titulo">Quando a indicação seca, o caixa seca junto.</p>
+        <p class="sintoma-desc">Não há processo ativo de captação. Quando o fluxo espontâneo cai, a escola fica paralisada sem saber por onde começar.</p>
+      </div>
+
+      <div class="sintoma-card reveal reveal-delay-2">
+        <span class="sintoma-num">— 05</span>
+        <p class="sintoma-titulo">O aluno começa a faltar. Você só percebe quando ele foi embora.</p>
+        <p class="sintoma-desc">O churn começa nas faltas — e sem protocolo de retenção, a receita sangra enquanto você ainda acredita que o aluno vai voltar.</p>
+      </div>
+
+      <div class="sintoma-card reveal reveal-delay-3" style="background:var(--dark)">
+        <span class="sintoma-num" style="color:var(--white-muted)">— 06</span>
+        <p class="sintoma-titulo" style="font-family:'Instrument Serif',serif;font-style:italic;color:var(--white-dim);font-size:17px">Não é a qualidade do seu ensino. Não é a sua cidade. Não é o mercado.</p>
+        <p class="sintoma-desc" style="color:var(--white-muted)">É a ausência de um processo comercial. E isso tem solução.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- VIRADA -->
+<section class="virada">
+  <div class="container">
+    <div class="virada-bloco reveal">
+      <h2 class="virada-titulo">A causa real<br>do problema</h2>
+      <div class="virada-corpo">
+        <p>Não é a qualidade do seu ensino. Não é a cidade. Não é o mercado difícil.</p>
+        <p>É a ausência de um processo comercial simples — que qualquer pessoa do seu time consiga seguir.</p>
+        <p class="destaque">Sem processo, cada conversa de venda é uma improvisação.<br>E improvisação não escala. Improvisação não matricula.</p>
+        <p class="conclusao">Em 4 anos atendendo escolas de inglês, vi esse ciclo destruir negócios bons, com donos dedicados — que fecharam por falta de método, não por falta de vontade.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- SOLUÇÃO -->
-<section class="section">
-  <span class="section-tag">A solução</span>
-  <h2>Método EC — Escola Cheia</h2>
-  <p>Um guia prático com scripts prontos para cada etapa do processo comercial de uma escola de inglês. Não é teoria — é o que você copia, personaliza e usa ainda hoje no WhatsApp.</p>
+<section class="solucao">
+  <div class="container-wide">
+    <div class="container">
+      <p class="section-label reveal">A solução</p>
+      <h2 class="section-title reveal reveal-delay-1">Método EC —<br>Escola Cheia</h2>
+      <p class="solucao-sub reveal reveal-delay-2">Um guia prático com scripts prontos para cada etapa do processo comercial de uma escola de inglês. Não é teoria — é o que você copia, personaliza e usa ainda hoje no WhatsApp.</p>
+    </div>
 
-  <div class="modules">
-    <div class="module">
-      <div class="module-num">01</div>
-      <div class="module-content">
-        <h3>Scripts de Prospecção Ativa</h3>
-        <p>Roteiros para abordar novos seguidores no Instagram, leads por indicação, contatos presenciais, pais de crianças, adultos e empresas — com a abertura certa, as perguntas certas e o convite para matrícula.</p>
-        <div class="module-tags">
-          <span class="module-tag">Novo seguidor no Instagram</span>
-          <span class="module-tag">Adultos e jovens</span>
-          <span class="module-tag">Pais de crianças</span>
-          <span class="module-tag">Abordagem presencial</span>
-          <span class="module-tag">Indicação</span>
-          <span class="module-tag">Corporativo</span>
+    <div class="modulos">
+      <div class="modulo reveal">
+        <div class="modulo-num-col"><span class="modulo-num">01</span></div>
+        <div class="modulo-corpo">
+          <h3 class="modulo-titulo">Scripts de Prospecção Ativa</h3>
+          <p class="modulo-desc">Roteiros para abordar novos seguidores no Instagram, leads por indicação, contatos presenciais, pais de crianças, adultos e empresas — com a abertura certa, as perguntas certas e o convite para matrícula.</p>
+          <div class="tags">
+            <span class="tag">Novo seguidor</span><span class="tag">Adultos e jovens</span><span class="tag">Pais de crianças</span><span class="tag">Presencial</span><span class="tag">Indicação</span><span class="tag">Corporativo</span>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="module">
-      <div class="module-num">02</div>
-      <div class="module-content">
-        <h3>Sequência Completa de Follow-up</h3>
-        <p>Cadência de 5 mensagens para reativar leads que sumiram após o primeiro contato — com ângulos diferentes a cada etapa: lembrete, benefício, prova social, urgência e reaquecimento.</p>
-        <div class="module-tags">
-          <span class="module-tag">D+1 · lembrete leve</span>
-          <span class="module-tag">D+3 · benefício novo</span>
-          <span class="module-tag">D+7 · prova social</span>
-          <span class="module-tag">D+14 · urgência real</span>
-          <span class="module-tag">D+30 · reaquecimento</span>
+
+      <div class="modulo reveal reveal-delay-1">
+        <div class="modulo-num-col"><span class="modulo-num">02</span></div>
+        <div class="modulo-corpo">
+          <h3 class="modulo-titulo">Sequência Completa de Follow-up</h3>
+          <p class="modulo-desc">Cadência de 5 mensagens para reativar leads que sumiram após o primeiro contato — com ângulos diferentes a cada etapa: lembrete, benefício, prova social, urgência e reaquecimento.</p>
+          <div class="tags">
+            <span class="tag">D+1 · lembrete</span><span class="tag">D+3 · benefício</span><span class="tag">D+7 · prova social</span><span class="tag">D+14 · urgência</span><span class="tag">D+30 · reaquecimento</span>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="module">
-      <div class="module-num">03</div>
-      <div class="module-content">
-        <h3>Guia de Quebra de Objeções</h3>
-        <p>As 8 objeções mais comuns em escolas de inglês — com a causa real por trás de cada uma, resposta curta para WhatsApp e resposta completa para conversa presencial. Inclui os desdobramentos mais prováveis de cada conversa.</p>
-        <div class="module-tags">
-          <span class="module-tag">"Tá caro"</span>
-          <span class="module-tag">"Vou pensar"</span>
-          <span class="module-tag">"Não tenho tempo"</span>
-          <span class="module-tag">"Já tentei antes"</span>
-          <span class="module-tag">"Online é mais barato"</span>
-          <span class="module-tag">+ 3 objeções</span>
+
+      <div class="modulo reveal reveal-delay-2">
+        <div class="modulo-num-col"><span class="modulo-num">03</span></div>
+        <div class="modulo-corpo">
+          <h3 class="modulo-titulo">Guia de Quebra de Objeções</h3>
+          <p class="modulo-desc">As 8 objeções mais comuns em escolas de inglês — com a causa real por trás de cada uma, resposta curta para WhatsApp e resposta completa para presencial. Inclui os desdobramentos mais prováveis de cada conversa.</p>
+          <div class="tags">
+            <span class="tag">"Tá caro"</span><span class="tag">"Vou pensar"</span><span class="tag">"Não tenho tempo"</span><span class="tag">"Já tentei antes"</span><span class="tag">"Online é mais barato"</span><span class="tag">+ 3 objeções</span>
+          </div>
         </div>
       </div>
     </div>
   </div>
+</section>
 
-  <h3 style="font-family:'Sora',sans-serif;color:var(--white);font-size:1rem;margin:2.5rem 0 1rem;">O que você recebe:</h3>
-  <div class="deliverables">
-    <div class="deliverable">
-      <span class="deliverable-icon">📘</span>
-      <h4>Guia completo</h4>
-      <p>Apostila visual com todos os scripts, dicas e situações reais — leia em 20 minutos</p>
-    </div>
-    <div class="deliverable">
-      <span class="deliverable-icon">📝</span>
-      <h4>Doc editável</h4>
-      <p>Scripts prontos para personalizar com o nome da sua escola</p>
-    </div>
-    <div class="deliverable">
-      <span class="deliverable-icon">📊</span>
-      <h4>Planilha de leads</h4>
-      <p>Controle completo com dashboard automático de conversão</p>
-    </div>
-    <div class="deliverable">
-      <span class="deliverable-icon">✅</span>
-      <h4>Checklist diário</h4>
-      <p>Ações comerciais para o time executar todos os dias</p>
+<!-- MATERIAIS -->
+<section class="materiais">
+  <div class="container">
+    <p class="section-label reveal">O que você recebe</p>
+    <h2 class="section-title reveal reveal-delay-1">Acesso completo a:</h2>
+    <div class="materiais-grid">
+      <div class="material-item reveal reveal-delay-1">
+        <span class="mat-icon">📘</span>
+        <div class="mat-info"><h4>Guia completo</h4><p>Apostila visual com todos os scripts, dicas e situações reais — leia em 20 minutos</p></div>
+      </div>
+      <div class="material-item reveal reveal-delay-2">
+        <span class="mat-icon">📝</span>
+        <div class="mat-info"><h4>Doc editável</h4><p>Scripts prontos para personalizar com o nome da sua escola</p></div>
+      </div>
+      <div class="material-item reveal reveal-delay-2">
+        <span class="mat-icon">📊</span>
+        <div class="mat-info"><h4>Planilha de leads</h4><p>Controle completo com dashboard automático de conversão</p></div>
+      </div>
+      <div class="material-item reveal reveal-delay-3">
+        <span class="mat-icon">✅</span>
+        <div class="mat-info"><h4>Checklist diário</h4><p>Ações comerciais para o time executar todos os dias</p></div>
+      </div>
     </div>
   </div>
 </section>
 
-<div class="divider"></div>
-
-<!-- PARA QUEM É -->
-<section class="section">
-  <span class="section-tag">Para quem é</span>
-  <h2>O Método EC foi feito para você se...</h2>
-  <div class="for-grid">
-    <div class="for-card yes">
-      <span class="for-label">É para você</span>
-      <ul>
-        <li>Você tem escola de inglês e quer matricular mais</li>
-        <li>Sua escola depende de indicação e quer mudar isso</li>
-        <li>Você trava quando o lead fala "tá caro" ou "vou pensar"</li>
-        <li>Você não faz follow-up por não saber o que escrever</li>
-        <li>Você quer um processo que qualquer pessoa do time consiga seguir</li>
-        <li>Você quer parar de improvisar cada conversa de venda</li>
-      </ul>
-    </div>
-    <div class="for-card no">
-      <span class="for-label">Não é para você</span>
-      <ul>
-        <li>Você busca scripts de pressão ou abordagem agressiva</li>
-        <li>Sua escola já tem processo comercial estruturado e funcionando</li>
-        <li>Você quer apenas teoria sem aplicação prática</li>
-        <li>Você não está disposto a aplicar o que aprender</li>
-      </ul>
+<!-- PARA QUEM -->
+<section class="para-quem">
+  <div class="container">
+    <p class="section-label reveal">Para quem é</p>
+    <h2 class="section-title reveal reveal-delay-1" style="margin-bottom:24px">O Método EC foi<br>feito para você se...</h2>
+    <p class="pq-intro reveal reveal-delay-2">Se você leu até aqui e sentiu que estávamos falando de você — o Método EC foi feito para você.</p>
+    <div class="pq-grid">
+      <div class="pq-col sim reveal reveal-delay-2">
+        <h3>É para você</h3>
+        <ul class="pq-lista">
+          <li>Você tem escola de inglês e quer matricular mais</li>
+          <li>Sua escola depende de indicação e quer mudar isso</li>
+          <li>Você trava quando o lead fala "tá caro" ou "vou pensar"</li>
+          <li>Você não faz follow-up por não saber o que escrever</li>
+          <li>Você quer um processo que qualquer pessoa do time consiga seguir</li>
+          <li>Você quer parar de improvisar cada conversa de venda</li>
+        </ul>
+      </div>
+      <div class="pq-col nao reveal reveal-delay-3">
+        <h3>Não é para você</h3>
+        <ul class="pq-lista">
+          <li>Você busca scripts de pressão ou abordagem agressiva</li>
+          <li>Sua escola já tem processo comercial estruturado e funcionando</li>
+          <li>Você quer apenas teoria sem aplicação prática</li>
+          <li>Você não está disposto a aplicar o que aprender</li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
 
-<div class="divider"></div>
-
-<!-- AUTOR -->
-<section class="author-section">
-  <div class="author-left">
-    <div class="author-avatar">👨‍💼</div>
-    <p class="author-name">Consultor Método EC</p>
-    <p class="author-role">Consultor comercial · 4+ anos</p>
-  </div>
-  <div class="author-right">
-    <span class="section-tag">Quem criou</span>
-    <h2>Por trás do Método EC</h2>
-    <p>Antes mesmo de atuar como consultor, ao tentar aprender inglês, percebi como era difícil para uma pessoa escolher uma escola. As escolas respondiam o que era perguntado, mandavam o preço — e esperavam. O lead sumia.</p>
-    <p>Depois, como professor e consultor comercial, fui procurado por alunos de outras escolas que me contavam exatamente isso: como foi frustrante o processo de buscar uma escola. Ninguém fez follow-up. Ninguém soube responder quando eles disseram "vou pensar".</p>
-    <p>Em mais de 4 anos atendendo escolas de inglês como consultor, esse padrão se confirmou. O Método EC foi criado para resolver exatamente isso.</p>
+<!-- CRIADOR -->
+<section class="criador">
+  <div class="container">
+    <p class="section-label reveal">Por trás do Método EC</p>
+    <div class="criador-bloco">
+      <div class="criador-meta reveal">
+        <p class="criador-label">Quem criou</p>
+        <p class="criador-cargo">Consultor<br>Comercial</p>
+        <p class="criador-anos">4+ anos em escolas de inglês</p>
+      </div>
+      <div class="criador-texto">
+        <p class="reveal reveal-delay-1">Em 4 anos como consultor comercial para escolas de inglês, vi o mesmo ciclo se repetir dezenas de vezes.</p>
+        <p class="reveal reveal-delay-2"><strong>Dono animado, escola aberta, expectativa alta.</strong> Semanas depois, a realidade batia: nenhum processo, nenhum script, nenhuma direção.</p>
+        <p class="reveal reveal-delay-2">Leads sumindo sem follow-up. Alunos cancelando sem aviso. Caixa no vermelho. E a sensação de que o problema era a cidade, o mercado, o momento — quando na verdade era a ausência de um método comercial.</p>
+        <p class="reveal reveal-delay-3"><strong>Vi escolas boas fecharem por isso.</strong> Donos dedicados baixarem CNPJ por isso.</p>
+        <p class="final reveal reveal-delay-3">O Método EC foi criado para quebrar esse ciclo — com o processo que essas escolas precisavam e nunca tiveram.</p>
+      </div>
+    </div>
   </div>
 </section>
 
-<div class="divider"></div>
-
-<!-- OFERTA -->
-<div class="offer-wrap">
-  <span class="section-tag" style="display:block;text-align:center;">Acesso completo</span>
-  <h2 style="color:var(--blue-light);text-align:center;">Método EC — Escola Cheia</h2>
-
-  <div class="price-card">
-    <p class="price-label">Investimento único</p>
-    <p class="price-value"><span>R$</span> 37</p>
-    <p class="price-sub">Acesso imediato a todo o material após o pagamento</p>
-
-    <div class="guarantee">
-      <span class="guarantee-icon">🛡️</span>
-      <p><strong>Garantia incondicional de 7 dias.</strong> Se comprar, ler e achar que não vale, devolvo cada centavo — sem perguntas.</p>
+<!-- PREÇO -->
+<section class="preco">
+  <div class="container">
+    <div class="preco-bloco">
+      <h2 class="preco-titulo reveal">Acesso completo.<br>Hoje.</h2>
+      <div class="preco-box reveal reveal-delay-1">
+        <p class="preco-label">Investimento único</p>
+        <p class="preco-valor"><span class="preco-prefix">R$</span> 37</p>
+        <p class="preco-desc">Acesso imediato a todo o material após o pagamento</p>
+        <a href="LINK_HOTMART_AQUI" class="btn">Quero acesso ao Método EC</a>
+      </div>
+      <div class="garantia reveal reveal-delay-2">
+        <span class="garantia-icon">🛡️</span>
+        <p class="garantia-texto"><strong>Garantia incondicional de 7 dias.</strong> Se comprar, ler e achar que não vale, devolvo cada centavo — sem perguntas.</p>
+      </div>
+      <p class="preco-urgencia reveal reveal-delay-3">
+        Cada semana sem um processo é uma semana cedendo matrícula para o concorrente.<br>
+        <strong>Isso não é exagero — é o padrão que se repete em toda escola sem método.</strong><br>
+        O Método EC resolve isso em menos de 30 minutos de leitura.
+      </p>
     </div>
-
-    <div class="urgency">
-      Cada semana sem um processo é uma semana cedendo matrículas para o concorrente. O Método EC resolve isso em menos de 30 minutos de leitura.
-    </div>
-
-    <a href="LINK_HOTMART_AQUI" class="btn-primary" style="width:100%;justify-content:center;font-size:1rem;">
-      Quero acesso ao Método EC
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-    </a>
-    <p style="font-size:11px;color:var(--gray);margin-top:12px;opacity:0.7;">Compra 100% segura · Hotmart</p>
   </div>
-</div>
+</section>
 
 <footer>
-  <p>© 2025 Método EC — Escola Cheia · Todos os direitos reservados</p>
+  <div class="container">
+    <p>© 2025 Método EC — Escola Cheia &nbsp;·&nbsp; Todos os direitos reservados &nbsp;·&nbsp; Compra 100% segura via Hotmart</p>
+  </div>
 </footer>
 
+<script>
+// ======= SCROLL REVEAL =======
+const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-scale');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+revealEls.forEach(el => observer.observe(el));
+
+// ======= PARALLAX BG TEXT =======
+const bgText = document.querySelector('.narrativa-bg-text');
+if (bgText) {
+  window.addEventListener('scroll', () => {
+    const section = bgText.closest('.narrativa');
+    const rect = section.getBoundingClientRect();
+    const progress = -rect.top / (window.innerHeight);
+    bgText.style.transform = `translateY(calc(-50% + ${progress * 60}px))`;
+  }, { passive: true });
+}
+
+// ======= HERO COUNTERS =======
+function animateHeroCounter(el, target, prefix, suffix, duration) {
+  const start = performance.now();
+  const update = (now) => {
+    const t = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - t, 3);
+    const val = Math.round(eased * target);
+    el.textContent = (prefix || '') + val.toLocaleString('pt-BR') + (suffix || '');
+    if (t < 1) requestAnimationFrame(update);
+  };
+  requestAnimationFrame(update);
+}
+
+setTimeout(() => {
+  animateHeroCounter(document.getElementById('hc1'), 23, '', '+', 1400);
+  setTimeout(() => animateHeroCounter(document.getElementById('hc2'), 6, '', '+', 1200), 200);
+  setTimeout(() => animateHeroCounter(document.getElementById('hc3'), 4700, 'R$ ', '', 1600), 400);
+}, 800);
+
+// ======= SCROLL COUNTERS =======
+const counterEls = document.querySelectorAll('.counter-num[data-target]');
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const el = e.target;
+      const target = parseInt(el.dataset.target);
+      const prefix = el.dataset.prefix || '';
+      const suffix = el.dataset.suffix !== undefined ? el.dataset.suffix : '';
+      const start = performance.now();
+      const dur = 1800;
+      const tick = (now) => {
+        const t = Math.min((now - start) / dur, 1);
+        const eased = 1 - Math.pow(1 - t, 4);
+        const val = Math.round(eased * target);
+        el.textContent = prefix + val.toLocaleString('pt-BR') + suffix;
+        if (t < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+      counterObserver.unobserve(el);
+    }
+  });
+}, { threshold: 0.4 });
+counterEls.forEach(el => counterObserver.observe(el));
+
+// ======= CHARTS =======
+const chartObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting && !e.target.dataset.drawn) {
+      e.target.dataset.drawn = '1';
+      const id = e.target.id;
+      drawChart(id);
+    }
+  });
+}, { threshold: 0.3 });
+
+['chartAlunos','chartCaixa','chartConversao','chartMotivo'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) chartObserver.observe(el);
+});
+
+function drawChart(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.parentElement.style.height = '200px';
+
+  const red = '#c0392b';
+  const redDim = 'rgba(192,57,43,0.15)';
+  const white = '#f5f0eb';
+  const muted = '#3a3835';
+  const gold = '#c9a96e';
+  const gridColor = 'rgba(255,255,255,0.04)';
+  const tickColor = '#5c5850';
+
+  const commonScales = {
+    x: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11, family: "'DM Sans'" } } },
+    y: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11, family: "'DM Sans'" } } }
+  };
+
+  if (id === 'chartAlunos') {
+    new Chart(el, {
+      type: 'line',
+      data: {
+        labels: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago'],
+        datasets: [{
+          label: 'Alunos ativos',
+          data: [80, 74, 65, 58, 49, 40, 31, 22],
+          borderColor: red,
+          backgroundColor: redDim,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: red,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          borderDash: undefined
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: commonScales,
+        animation: { duration: 1200, easing: 'easeOutQuart' }
+      }
+    });
+  }
+
+  if (id === 'chartCaixa') {
+    new Chart(el, {
+      type: 'bar',
+      data: {
+        labels: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago'],
+        datasets: [{
+          label: 'Receita (R$)',
+          data: [18000, 16500, 14800, 13200, 11000, 9200, 7100, 5000],
+          backgroundColor: [red, red, red, red, red, red, red, '#701a10'],
+          borderRadius: 2
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          ...commonScales,
+          y: { ...commonScales.y, ticks: { ...commonScales.y.ticks, callback: v => 'R$' + (v/1000).toFixed(0) + 'k' } }
+        },
+        animation: { duration: 1200, easing: 'easeOutQuart' }
+      }
+    });
+  }
+
+  if (id === 'chartConversao') {
+    new Chart(el, {
+      type: 'bar',
+      data: {
+        labels: ['Sem processo', 'Com processo'],
+        datasets: [{
+          label: 'Conversão (%)',
+          data: [7, 32],
+          backgroundColor: ['#701a10', gold],
+          borderRadius: 2
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: {
+          callbacks: { label: ctx => ' ' + ctx.raw + '%' }
+        }},
+        scales: {
+          x: { ...commonScales.x, max: 40, ticks: { ...commonScales.x.ticks, callback: v => v + '%' } },
+          y: { ...commonScales.y }
+        },
+        animation: { duration: 1200, easing: 'easeOutQuart' }
+      }
+    });
+  }
+
+  if (id === 'chartMotivo') {
+    new Chart(el, {
+      type: 'doughnut',
+      data: {
+        labels: ['Sem processo comercial', 'Falta de capital', 'Outros'],
+        datasets: [{
+          data: [58, 22, 20],
+          backgroundColor: [red, '#3a1a18', muted],
+          borderColor: '#0a0a0a',
+          borderWidth: 3,
+          hoverOffset: 6
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        cutout: '62%',
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom',
+            labels: { color: tickColor, font: { size: 11, family: "'DM Sans'" }, boxWidth: 10, padding: 14 }
+          }
+        },
+        animation: { duration: 1200, animateRotate: true }
+      }
+    });
+  }
+}
+</script>
 </body>
 </html>
